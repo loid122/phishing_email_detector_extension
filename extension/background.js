@@ -1,49 +1,43 @@
-chrome.runtime.onInstalled.addListener(() => {
-    console.log("Gmail Phishing Detector Installed");
-  });
+// Function to check if a URL is phishing using PhishTank API     Doesntwork yet , no phishtank api 11/3
+async function checkUrlWithPhishTank(url) {
+    const apiUrl = "http://checkurl.phishtank.com/checkurl/";
+    const apiKey = "YOUR_PHISHTANK_API_KEY"; // Replace with your API key
   
-  // gets action from content.js
-  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.action === "checkPhishing") {
-      const isPhishing = detectPhishing(request.emailContent);
-      sendResponse({ result: isPhishing });
+    const payload = new URLSearchParams({
+      url: url,
+      format: "json",
+      app_key: apiKey,
+    });
+  
+    try {
+      const response = await fetch(apiUrl, {
+        method: "POST",
+        body: payload,
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      });
+  
+      const data = await response.json();
+      return data.results.in_database && data.results.valid; // True if phishing
+    } catch (error) {
+      console.error("Error checking URL:", error);
+      return false; // Assume safe if API fails
     }
-  });
-  
-  //Hardcoded trigger words 
-  function detectPhishing(content) {
-    const phishingIndicators = [
-      "urgent action required",
-      "verify account",
-      "password reset",
-      "suspicious activity",
-      "click here",
-      "verify fast",
-      "Click this link",
-      "account suspension",
-      "change your password",
-      "unusual activity detected",
-      "immediate response needed",
-      "your account will be closed",
-      "last notice",
-      "refund request",
-      "open this attachment",
-      "support team request",
-      "confirm your credit card",
-      "work from home opportunity",
-      "exclusive reward",
-      "you’ve won lottery",
-      "lottery winner"
-
-    ];
-  
-    function detectPhishing(content) {
-        const lowerContent = content.toLowerCase();
-        const matchCount = phishingIndicators.filter((phrase) =>
-          lowerContent.includes(phrase)
-        ).length;
-      
-        return matchCount >= 2; // Trigger only if 2 or more matches
-      }
   }
   
+  // Intercept web requests
+  chrome.webRequest.onBeforeRequest.addListener(
+    async (details) => {
+      const url = details.url;
+  
+      // Check if the URL is phishing
+      const isPhishing = await checkUrlWithPhishTank(url);
+      if (isPhishing) {
+        // Redirect to a blocked page
+        return { redirectUrl: chrome.runtime.getURL("blocked.html") };
+      }
+    },
+    { urls: ["<all_urls>"] }, // Monitor all URLs
+    ["blocking"]
+  );

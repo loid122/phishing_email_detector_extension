@@ -1,24 +1,24 @@
 {
     "manifest_version": 3,
-    "name": "Gmail Phishing Detector",
+    "name": "Phishing Detector",
     "version": "1.0",
-    "description": "Detects phishing attempts in given Gmail",
-    "permissions": ["activeTab", "storage", "scripting"],
-    "host_permissions": ["https://mail.google.com/*"],
+    "description": "Detects and blocks phishing websites in real-time.",
+    "permissions": ["webRequest", "webRequestBlocking", "storage", "tabs"],
+    "host_permissions": ["<all_urls>"],
     "background": {
       "service_worker": "background.js"
     },
-    "content_scripts": [
-      {
-        "matches": ["https://mail.google.com/*"],
-        "js": ["content.js"]
-      }
-    ],
     "action": {
-      "popup": "popup.html",
-      "icon": {
-        "16": "extension_icon.png"  
+      "default_popup": "popup.html",
+      "default_icon": {
+        "16": "icons/icon16.png",
+        "48": "icons/icon48.png",
+        "128": "icons/icon128.png"
       }
+    },
+    "icons": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
     }
   }
-  
