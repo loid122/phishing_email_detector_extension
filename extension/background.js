@@ -1,4 +1,4 @@
-// Function to check if a URL is phishing using PhishTank API     Doesntwork yet , no phishtank api 11/3
+// Function to check if a URL is phishing using PhishTank API   
 async function checkUrlWithPhishTank(url) {
     const apiUrl = "http://checkurl.phishtank.com/checkurl/";
     const apiKey = "YOUR_PHISHTANK_API_KEY"; // Replace with your API key
